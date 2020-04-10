@@ -16,6 +16,10 @@ export default class App {
 		this.initControllers(controllers);
 	}
 
+	private initDatabase(): void {
+		new Connection();
+	}
+
 	private initMiddlewares(): void {
 		// Json body parser
 		this.app.use(express.json());
@@ -25,10 +29,6 @@ export default class App {
 		controllers.forEach(controller => {
 			this.app.use('/', controller.router);
 		});
-	}
-
-	private initDatabase(): void {
-		new Connection();
 	}
 
 	public listen(): void {
