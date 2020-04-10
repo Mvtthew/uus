@@ -1,4 +1,4 @@
-import Controller from "../models/Controller";
+import Controller from "../types/Controller";
 
 export default class UsersController extends Controller {
 
