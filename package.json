@@ -2,7 +2,7 @@
 	"name": "uusts",
 	"version": "0.0.1",
 	"description": "Universal users server (UUS)",
-	"main": "app.js",
+	"main": "Start.js",
 	"scripts": {
 		"start": "node dist/Start.js",
 		"dev": "nodemon src/Start.ts",
