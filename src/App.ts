@@ -1,5 +1,6 @@
 import express from "express";
 import Controller from "./types/Controller";
+import Connection from "./database/Connection";
 
 export default class App {
 
@@ -10,6 +11,7 @@ export default class App {
 		this.app = express();
 		this.PORT = port;
 
+		this.initDatabase();
 		this.initMiddlewares();
 		this.initControllers(controllers);
 	}
@@ -23,6 +25,10 @@ export default class App {
 		controllers.forEach(controller => {
 			this.app.use('/', controller.router);
 		});
+	}
+
+	private initDatabase(): void {
+		new Connection();
 	}
 
 	public listen(): void {
