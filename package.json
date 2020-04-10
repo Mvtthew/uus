@@ -1,20 +1,19 @@
 {
-	"name": "universal-users-system",
+	"name": "uusts",
 	"version": "0.0.1",
-	"description": "Universal Auth system for all of my allplications",
+	"description": "Universal users server (UUS)",
 	"main": "app.js",
 	"scripts": {
-		"start": "node .",
-		"test": "jasmine-node spec"
+		"start": "node dist/Start.js",
+		"dev": "nodemon src/Start.ts",
+		"build": "tsc -p ."
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Mvtthew/uus.git"
+		"url": "git+https://github.com/Mvtthew/uus.git"
 	},
 	"keywords": [
-		"Authorization",
-		"Identification",
-		"Microservice"
+		"Node"
 	],
 	"author": "Mateusz Ożóg",
 	"license": "MIT",
@@ -23,11 +22,13 @@
 	},
 	"homepage": "https://github.com/Mvtthew/uus#readme",
 	"dependencies": {
-		"express": "^4.17.1",
-		"jasmine-node": "^3.0.0",
-		"jsonwebtoken": "^8.5.1",
-		"md5": "^2.2.1",
-		"mongoose": "^5.9.7",
-		"rxjs": "^6.5.5"
+		"express": "^4.17.1"
+	},
+	"devDependencies": {
+		"@types/express": "^4.17.6",
+		"@types/node": "^13.11.1",
+		"nodemon": "^2.0.3",
+		"ts-node": "^8.8.2",
+		"typescript": "^3.8.3"
 	}
 }
