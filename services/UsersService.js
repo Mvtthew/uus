@@ -1,5 +1,6 @@
 const { Observable } = require('rxjs');
 const md5 = require('md5');
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 
