@@ -1,0 +1,27 @@
+{
+  "name": "universal-users-system",
+  "version": "0.0.1",
+  "description": "Universal Auth system for all of my allplications",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mvtthew/uus.git"
+  },
+  "keywords": [
+    "Authorization",
+    "Identification",
+    "Microservice"
+  ],
+  "author": "Mateusz Ożóg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Mvtthew/uus/issues"
+  },
+  "homepage": "https://github.com/Mvtthew/uus#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
