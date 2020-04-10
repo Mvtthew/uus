@@ -11,4 +11,7 @@ router.get('/', (req, res) => {
 	});
 });
 
+// Users routes
+router.use('/users', require('./users'));
+
 module.exports = router;

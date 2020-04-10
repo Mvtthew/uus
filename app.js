@@ -1,6 +1,9 @@
 const express = require('express');
 const app = express();
 
+// Connect to database
+require('./database/connect');
+
 // Initialize routes
 app.use(require('./routes'));
 
