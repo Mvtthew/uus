@@ -21,4 +21,10 @@ router.delete('/', auth, (req, res) => {
 	userService.deleteUser(req).subscribe(data => res.json(data));
 });
 
+
+// Profile image
+router.post('/image', auth, (req, res) => {
+	userService.addUserImage(req).subscribe(data => res.json(data));
+});
+
 module.exports = router;

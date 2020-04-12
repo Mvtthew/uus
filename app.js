@@ -1,8 +1,11 @@
 const express = require('express');
+const expressFileupload = require('express-fileupload');
 const colors = require('colors');
 const app = express();
 
+// Body parsers
 app.use(express.json());
+app.use(expressFileupload());
 
 // Connect to database
 require('./database/connect');

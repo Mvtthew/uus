@@ -1,6 +1,8 @@
 const { Observable } = require('rxjs');
 const md5 = require('md5');
 const colors = require('colors');
+const path = require('path');
+const fs = require('fs');
 
 const AuthService = require('./AuthService');
 const authService = new AuthService();
@@ -152,6 +154,57 @@ module.exports = class UsersService {
 
 	// TODO
 	editUser(req) { }
+
+	addUserImage(req) {
+		return new Observable(subscriber => {
+			const { image } = req.files;
+			if (image) {
+				const alowedMaxSize = 1024 * 1024 * 5;
+				if (image.size < alowedMaxSize) {
+					const allowedMimetypes = [
+						'image/jpeg',
+						'image/jpg',
+						'image/png',
+						'image/gif'
+					];
+					if (allowedMimetypes.includes(image.mimetype)) {
+						const fileName = md5(`${req.user._id}-profile_image-${image.name}`) + image.name.substr(image.name.length - 5);
+						image.mv(path.resolve(`./store/profile-images/${fileName}`), (err) => {
+							if (err) throw err;
+							User.findOne(req.user._id).then(user => {
+								if (user.image) {
+									fs.unlink(path.resolve(`./store/profile-images/${user.image}`), (err) => {
+										if (err) throw err;
+									});
+								}
+								user.image = fileName;
+								user.save().then(() => {
+									subscriber.next({
+										message: 'Profile image successfully uploaded'
+									});
+								});
+							});
+						});
+					} else {
+						subscriber.next({
+							error: true,
+							message: `File needs to be image (allowed types ${allowedMimetypes})`
+						});
+					}
+				} else {
+					subscriber.next({
+						error: true,
+						message: `File is to large (max ${alowedMaxSize / 1024 / 1024}MB)`
+					});
+				}
+			} else {
+				subscriber.next({
+					error: true,
+					message: 'File is required (image)'
+				});
+			}
+		});
+	}
 
 };
 
