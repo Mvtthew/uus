@@ -169,14 +169,14 @@ module.exports = class UsersService {
 					];
 					if (allowedMimetypes.includes(image.mimetype)) {
 						const fileName = md5(`${req.user._id}-profile_image-${image.name}`) + image.name.substr(image.name.length - 5);
-						image.mv(path.resolve(`./store/profile-images/${fileName}`), (err) => {
-							if (err) throw err;
-							User.findOne(req.user._id).then(user => {
-								if (user.image) {
-									fs.unlink(path.resolve(`./store/profile-images/${user.image}`), (err) => {
-										if (err) throw err;
-									});
-								}
+						User.findOne(req.user._id).then(user => {
+							if (user.image) {
+								fs.unlink(path.resolve(`./store/profile-images/${user.image}`), (err) => {
+									if (err) throw err;
+								});
+							}
+							image.mv(path.resolve(`./store/profile-images/${fileName}`), (err) => {
+								if (err) throw err;
 								user.image = fileName;
 								user.save().then(() => {
 									subscriber.next({
