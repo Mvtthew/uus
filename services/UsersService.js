@@ -1,7 +1,9 @@
 const { Observable } = require('rxjs');
 const md5 = require('md5');
 const colors = require('colors');
-const jwt = require('jsonwebtoken');
+
+const AuthService = require('./AuthService');
+const authService = new AuthService();
 
 const User = require('../models/User');
 
@@ -23,7 +25,7 @@ module.exports = class UsersService {
 									email,
 									password: md5(password)
 								}).then(user => {
-									console.log(`User {login: ${login}, email: ${email}} just registered!`.blue);
+									console.log(`User {login: ${login}, email: ${email}} just registered`.bgWhite.black);
 									subscriber.next({ login: user.login, email: user.email });
 								});
 							} else {
@@ -49,5 +51,55 @@ module.exports = class UsersService {
 
 		});
 	};
+
+	createUserToken(user) {
+		return new Observable(subscriber => {
+
+			const { login, email, password } = user;
+			if (login && password) {
+				User.findOne({ login, password: md5(password) }).then(user => {
+					if (user) {
+						authService.generateUserToken(user._id).subscribe(token => {
+							console.log(`User {login: ${user.login}} just generated a new token (login & password)`.bgCyan.black);
+							subscriber.next({
+								tokenType: 'Bearer',
+								token
+							});
+						});
+					} else {
+						subscriber.next({
+							error: true,
+							message: 'Invalid login or password'
+						});
+					}
+				});
+			} else if (email && password) {
+				User.findOne({ email, password: md5(password) }).then(user => {
+					if (user) {
+						authService.generateUserToken(user._id).subscribe(token => {
+							console.log(`User {login: ${user.login}} just generated a new token (email & password)`.bgCyan.black);
+							subscriber.next({
+								tokenType: 'Bearer',
+								token
+							});
+						});
+					} else {
+						subscriber.next({
+							error: true,
+							message: 'Invalid email or password'
+						});
+					}
+				});
+			} else {
+				subscriber.next({
+					error: true,
+					message: 'All required fields are not provided (login / email, password)'
+				});
+			}
+
+		});
+	}
+
+
 };
 
