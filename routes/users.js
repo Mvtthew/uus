@@ -27,4 +27,8 @@ router.post('/image', auth, (req, res) => {
 	userService.addUserImage(req).subscribe(data => res.json(data));
 });
 
+router.delete('/image', auth, (req, res) => {
+	userService.removeUserImage(req).subscribe(data => res.json(data));
+});
+
 module.exports = router;

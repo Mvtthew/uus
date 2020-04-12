@@ -141,11 +141,9 @@ module.exports = class UsersService {
 	deleteUser(req) {
 		return new Observable(subscriber => {
 
-			User.findById(req.user._id).then(user => {
-				user.remove().then(() => {
-					subscriber.next({
-						message: 'User was successfully deleted'
-					});
+			User.findByIdAndRemove(req.user._id).then(user => {
+				subscriber.next({
+					message: 'User was successfully deleted'
 				});
 			});
 
@@ -157,6 +155,7 @@ module.exports = class UsersService {
 
 	addUserImage(req) {
 		return new Observable(subscriber => {
+
 			const { image } = req.files;
 			if (image) {
 				const alowedMaxSize = 1024 * 1024 * 5;
@@ -207,6 +206,31 @@ module.exports = class UsersService {
 					message: 'File is required (image)'
 				});
 			}
+
+		});
+	}
+
+	removeUserImage(req) {
+		return new Observable(subscriber => {
+
+			User.findOne(req.user._id).then(user => {
+				if (user.image) {
+					fs.unlink(path.resolve(`./store/profile-images/${user.image}`), (err) => {
+						if (err) throw err;
+						user.image = '';
+						user.save().then(() => {
+							subscriber.next({
+								message: 'User profile image was deleted'
+							});
+						});
+					});
+				} else {
+					subscriber.next({
+						message: 'User does not have profile image'
+					});
+				}
+			});
+
 		});
 	}
 
