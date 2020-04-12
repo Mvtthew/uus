@@ -27,9 +27,11 @@ module.exports = class UsersService {
 									login,
 									email,
 									password: md5(password)
-								}).then(user => {
-									logService.log(`User {login: ${login}, email: ${email}} just registered`.bgYellow.black, 'registerUser', req);
-									subscriber.next({ login: user.login, email: user.email });
+								}).then(() => {
+									User.findOne({ login, email }).select({ password: 0 }).then(createdUser => {
+										logService.log(`User {${createdUser}} just registered`.bgYellow.black, 'registerUser', req);
+										subscriber.next(createdUser);
+									});
 								});
 							} else {
 								logService.log(`Tried to register user with {email: ${email}}`.bgRed.black, 'registerUser', req);
@@ -147,6 +149,9 @@ module.exports = class UsersService {
 
 		});
 	}
+
+	// TODO
+	editUser(req) { }
 
 };
 
