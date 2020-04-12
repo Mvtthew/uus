@@ -17,7 +17,7 @@ router.post('/checktoken', (req, res) => {
 	userService.checkToken(req).subscribe(data => res.json(data));
 });
 
-router.delete('/', auth, (req, res) => {
+router.delete('/me', auth, (req, res) => {
 	userService.deleteUser(req).subscribe(data => res.json(data));
 });
 
