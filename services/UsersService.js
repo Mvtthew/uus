@@ -28,10 +28,11 @@ module.exports = class UsersService {
 									email,
 									password: md5(password)
 								}).then(user => {
-									logService.log(`User {login: ${login}, email: ${email}} just registered`.bgWhite.black, 'registerUser', request);
+									logService.log(`User {login: ${login}, email: ${email}} just registered`.bgYellow.black, 'registerUser', request);
 									subscriber.next({ login: user.login, email: user.email });
 								});
 							} else {
+								logService.log(`Tried to register user with {email: ${email}}`.bgRed.black, 'registerUser', request);
 								subscriber.next({
 									error: true,
 									message: 'User with that email already exists'
@@ -39,6 +40,7 @@ module.exports = class UsersService {
 							}
 						});
 					} else {
+						logService.log(`Tried to register user with {login: ${login}}`.bgRed.black, 'registerUser', request);
 						subscriber.next({
 							error: true,
 							message: 'User with that login already exists'
@@ -46,6 +48,7 @@ module.exports = class UsersService {
 					}
 				});
 			} else {
+				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.black, 'registerUser', request);
 				subscriber.next({
 					error: true,
 					message: 'All required fields are not provided (login, email, password)'
@@ -96,6 +99,7 @@ module.exports = class UsersService {
 					}
 				});
 			} else {
+				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.black, 'registerUser', request);
 				subscriber.next({
 					error: true,
 					message: 'All required fields are not provided (login / email, password)'
