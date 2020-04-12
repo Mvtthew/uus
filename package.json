@@ -4,9 +4,9 @@
 	"description": "Universal users server (UUS)",
 	"main": "Start.js",
 	"scripts": {
-		"start": "node dist/Start.js",
-		"dev": "nodemon src/Start.ts",
-		"build": "tsc -p ."
+		"start": "node .",
+		"test": "jasmine-node spec",
+		"dev": "nodemon ."
 	},
 	"repository": {
 		"type": "git",
