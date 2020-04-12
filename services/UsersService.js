@@ -36,7 +36,7 @@ module.exports = class UsersService {
 									});
 								});
 							} else {
-								logService.log(`Tried to register user with {email: ${email}}`.bgRed.black, 'registerUser', req);
+								logService.log(`Tried to register user with {email: ${email}}`.bgRed.white, 'registerUser', req);
 								subscriber.next({
 									error: true,
 									message: 'User with that email already exists'
@@ -44,7 +44,7 @@ module.exports = class UsersService {
 							}
 						});
 					} else {
-						logService.log(`Tried to register user with {login: ${login}}`.bgRed.black, 'registerUser', req);
+						logService.log(`Tried to register user with {login: ${login}}`.bgRed.white, 'registerUser', req);
 						subscriber.next({
 							error: true,
 							message: 'User with that login already exists'
@@ -52,7 +52,7 @@ module.exports = class UsersService {
 					}
 				});
 			} else {
-				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.black, 'registerUser', req);
+				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.white, 'registerUser', req);
 				subscriber.next({
 					error: true,
 					message: 'All required fields are not provided (login, email, password)'
@@ -70,7 +70,7 @@ module.exports = class UsersService {
 				User.findOne({ login, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							logService.log(`User {login: ${user.login}} just generated a new token (login & password)`.bgCyan.black, 'createUserToken', req);
+							logService.log(`User {login: ${req.user.login}} just generated a new token (login & password)`.bgCyan.black, 'createUserToken', req);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
@@ -88,7 +88,7 @@ module.exports = class UsersService {
 				User.findOne({ email, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							logService.log(`User {login: ${user.login}} just generated a new token (email & password)`.bgCyan.black, 'createUserToken'.req);
+							logService.log(`User {login: ${req.user.login}} just generated a new token (email & password)`.bgCyan.black, 'createUserToken'.req);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
@@ -103,7 +103,7 @@ module.exports = class UsersService {
 					}
 				});
 			} else {
-				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.black, 'registerUser', req);
+				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.white, 'registerUser', req);
 				subscriber.next({
 					error: true,
 					message: 'All required fields are not provided (login / email, password)'
@@ -127,7 +127,7 @@ module.exports = class UsersService {
 				} else {
 					// Token is valid
 					User.findById(response._id).then(user => {
-						logService.log(`Token validation passed for user {login: ${user.login}, email: ${user.email}}`.bgGreen.black, 'checkToken', req);
+						logService.log(`Token validation passed for user {login: ${req.user.login}, email: ${req.user.email}}`.bgGreen.black, 'checkToken', req);
 						subscriber.next({
 							valid: true
 						});
@@ -142,7 +142,7 @@ module.exports = class UsersService {
 		return new Observable(subscriber => {
 
 			User.findByIdAndRemove(req.user._id).then(user => {
-				logService.log(`Removed user for user {login: ${user.login}, email: ${user.email}}`.bgYellow.black, 'deleteUser', req);
+				logService.log(`Removed user for user {login: ${req.user.login}, email: ${req.user.email}}`.bgYellow.black, 'deleteUser', req);
 				subscriber.next({
 					message: 'User was successfully deleted'
 				});
@@ -174,7 +174,7 @@ module.exports = class UsersService {
 							// Unlink previous user image if he had so
 							// TODO do not delete user image and reupload again if it is same image
 							if (user.image) {
-								fs.unlink(path.resolve(`./store/profile-images/${user.image}`), (err) => {
+								fs.unlink(path.resolve(`./store/profile-images/${req.user.image}`), (err) => {
 									if (err) throw err;
 								});
 							}
@@ -182,7 +182,7 @@ module.exports = class UsersService {
 							image.mv(path.resolve(`./store/profile-images/${fileName}`), (err) => {
 								if (err) throw err;
 								user.image = fileName;
-								logService.log(`Uploaded profile image for user {login: ${user.login}} (image size: ${image.size}, image name: ${fileName})`.bgMagenta, 'addUserImage', req);
+								logService.log(`Uploaded profile image for user {login: ${req.user.login}} (image size: ${image.size}, image name: ${fileName})`.bgMagenta, 'addUserImage', req);
 								user.save().then(() => {
 									subscriber.next({
 										message: 'Profile image successfully uploaded'
@@ -191,14 +191,14 @@ module.exports = class UsersService {
 							});
 						});
 					} else {
-						logService.log(`Tried to upload not allowed file for user {login: ${user.login}} (type: ${image.mimetype})`.bgYellow.black, 'addUserImage', req);
+						logService.log(`Tried to upload not allowed file for user {login: ${req.user.login}} (type: ${image.mimetype})`.bgRed.white, 'addUserImage', req);
 						subscriber.next({
 							error: true,
 							message: `File needs to be image (allowed types ${allowedMimetypes})`
 						});
 					}
 				} else {
-					logService.log(`Tried to upload to big file for user {login: ${user.login}} (size: ${image.size})`.bgYellow.black, 'addUserImage', req);
+					logService.log(`Tried to upload to big file for user {login: ${req.user.login}} (size: ${image.size})`.bgRed.white, 'addUserImage', req);
 					subscriber.next({
 						error: true,
 						message: `File is to large (max ${alowedMaxSize / 1024 / 1024}MB)`
@@ -219,18 +219,18 @@ module.exports = class UsersService {
 
 			User.findOne(req.user._id).then(user => {
 				if (user.image) {
-					fs.unlink(path.resolve(`./store/profile-images/${user.image}`), (err) => {
+					fs.unlink(path.resolve(`./store/profile-images/${req.user.image}`), (err) => {
 						if (err) throw err;
 						user.image = '';
 						user.save().then(() => {
-							logService.log(`Removed profile image for user {login: ${user.login}}`.bgYellow.black, 'removeUserImage', req);
+							logService.log(`Removed profile image for user {login: ${req.user.login}}`.bgYellow.black, 'removeUserImage', req);
 							subscriber.next({
 								message: 'User profile image was deleted'
 							});
 						});
 					});
 				} else {
-					logService.log(`Tried to remove not existing profile image for user {login: ${user.login}}`.bgYellow.black, 'removeUserImage', req);
+					logService.log(`Tried to remove not existing profile image for user {login: ${req.user.login}}`.bgYellow.black, 'removeUserImage', req);
 					subscriber.next({
 						message: 'User does not have profile image'
 					});
