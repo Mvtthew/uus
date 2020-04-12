@@ -4,15 +4,15 @@ const UserService = require('../services/UsersService');
 const userService = new UserService;
 
 router.post('/register', (req, res) => {
-	userService.registerUser(req.body).subscribe(data => res.json(data));
+	userService.registerUser(req).subscribe(data => res.json(data));
 });
 
 router.post('/token', (req, res) => {
-	userService.createUserToken(req.body).subscribe(data => res.json(data));
+	userService.createUserToken(req).subscribe(data => res.json(data));
 });
 
 router.post('/checktoken', (req, res) => {
-	userService.checkToken(req.body).subscribe(data => res.json(data));
+	userService.checkToken(req).subscribe(data => res.json(data));
 });
 
 module.exports = router;

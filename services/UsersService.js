@@ -5,11 +5,15 @@ const colors = require('colors');
 const AuthService = require('./AuthService');
 const authService = new AuthService();
 
+const LogService = require('./LogService');
+const logService = new LogService();
+
 const User = require('../models/User');
 
 module.exports = class UsersService {
 
-	registerUser(user) {
+	registerUser(request) {
+		const user = require.body;
 		return new Observable(subscriber => {
 
 			const { login, email, password } = user;
@@ -25,7 +29,7 @@ module.exports = class UsersService {
 									email,
 									password: md5(password)
 								}).then(user => {
-									console.log(`${new Date().getTime()} | User {login: ${login}, email: ${email}} just registered`.bgWhite.black);
+									logService.log(`User {login: ${login}, email: ${email}} just registered`.bgWhite.black, 'registerUser', request);
 									subscriber.next({ login: user.login, email: user.email });
 								});
 							} else {
@@ -52,7 +56,8 @@ module.exports = class UsersService {
 		});
 	}
 
-	createUserToken(user) {
+	createUserToken(request) {
+		const { user } = request.body;
 		return new Observable(subscriber => {
 
 			const { login, email, password } = user;
@@ -60,14 +65,14 @@ module.exports = class UsersService {
 				User.findOne({ login, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							console.log(`${new Date().getTime()} | User {login: ${user.login}} just generated a new token (login & password)`.bgCyan.black);
+							logService.log(`User {login: ${user.login}} just generated a new token (login & password)`.bgCyan.black, 'createUserToken', request);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
 							});
 						});
 					} else {
-						console.log(`${new Date().getTime()} | Bad credentials for user {login: ${login}}`.bgRed.white);
+						logService.log(`Bad credentials for user {login: ${login}}`.bgRed.white, 'createUserToken', request);
 						subscriber.next({
 							error: true,
 							message: 'Invalid login or password'
@@ -78,14 +83,14 @@ module.exports = class UsersService {
 				User.findOne({ email, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							console.log(`${new Date().getTime()} | User {login: ${user.login}} just generated a new token (email & password)`.bgCyan.black);
+							logService.log(`User {login: ${user.login}} just generated a new token (email & password)`.bgCyan.black, 'createUserToken'.request);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
 							});
 						});
 					} else {
-						console.log(`${new Date().getTime()} | Bad credentials for user {email: ${email}}`.bgRed.white);
+						logService.log(`Bad credentials for user {email: ${email}}`.bgRed.white, 'createUserToken', request);
 						subscriber.next({
 							error: true,
 							message: 'Invalid email or password'
@@ -103,20 +108,20 @@ module.exports = class UsersService {
 	}
 
 	checkToken(request) {
-		const { token } = request;
+		const { token } = request.body;
 		return new Observable(subscriber => {
 
 			authService.checkUserToken(token).subscribe(response => {
 				if (response === false) {
 					// Token is invalid
-					console.log(`Token validation failed`.bgRed.white);
+					logService.log(`Token validation failed`.bgRed.white, 'checkToken', request);
 					subscriber.next({
 						valid: false
 					});
 				} else {
 					// Token is valid
 					User.findById(response._id).then(user => {
-						console.log(`${new Date().getTime()} | Token validation passed for user {login: ${user.login}, email: ${user.email}}`.bgGreen.black);
+						logService.log(`Token validation passed for user {login: ${user.login}, email: ${user.email}}`.bgGreen.black, 'checkToken', request);
 						subscriber.next({
 							valid: true
 						});
