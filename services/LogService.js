@@ -6,12 +6,12 @@ const fs = require('fs');
 
 module.exports = class LogService {
 
-	log(logText, logType, request) {
+	log(logText, logType, req) {
 
-		const ip = request.headers['x-forwarded-for']
-			|| request.connection.remoteAddress
-			|| request.socket.remoteAddress
-			|| (request.connection.socket ? request.connection.socket.remoteAddress : null);
+		const ip = req.headers['x-forwarded-for']
+			|| req.connection.remoteAddress
+			|| req.socket.remoteAddress
+			|| (req.connection.socket ? req.connection.socket.remoteAddress : null);
 
 		const log = `${logType} | ${new Date().toISOString()} | ${ip} | ${logText}`;
 

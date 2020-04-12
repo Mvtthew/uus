@@ -5,7 +5,7 @@ const User = require('../models/User');
 
 module.exports = (req, res, next) => {
 
-	const tokenHeader = req.headers.Authorization;
+	const tokenHeader = req.headers.authorization;
 	if (tokenHeader) {
 		const tokenType = tokenHeader.split(' ')[0];
 		const token = tokenHeader.split(' ')[1];
@@ -18,8 +18,15 @@ module.exports = (req, res, next) => {
 					});
 				} else {
 					User.findById(response._id).then(user => {
-						req.user = user;
-						next();
+						if (user) {
+							req.user = user;
+							next();
+						} else {
+							res.json({
+								error: true,
+								message: "Invalid authorization token provided"
+							});
+						}
 					});
 				}
 			});

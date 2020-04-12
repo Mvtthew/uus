@@ -12,10 +12,10 @@ const User = require('../models/User');
 
 module.exports = class UsersService {
 
-	registerUser(request) {
+	registerUser(req) {
 		return new Observable(subscriber => {
 
-			const { login, email, password } = request.body;
+			const { login, email, password } = req.body;
 			if (login && email && password) {
 				// Login verification
 				User.findOne({ login }).then(user => {
@@ -28,11 +28,11 @@ module.exports = class UsersService {
 									email,
 									password: md5(password)
 								}).then(user => {
-									logService.log(`User {login: ${login}, email: ${email}} just registered`.bgYellow.black, 'registerUser', request);
+									logService.log(`User {login: ${login}, email: ${email}} just registered`.bgYellow.black, 'registerUser', req);
 									subscriber.next({ login: user.login, email: user.email });
 								});
 							} else {
-								logService.log(`Tried to register user with {email: ${email}}`.bgRed.black, 'registerUser', request);
+								logService.log(`Tried to register user with {email: ${email}}`.bgRed.black, 'registerUser', req);
 								subscriber.next({
 									error: true,
 									message: 'User with that email already exists'
@@ -40,7 +40,7 @@ module.exports = class UsersService {
 							}
 						});
 					} else {
-						logService.log(`Tried to register user with {login: ${login}}`.bgRed.black, 'registerUser', request);
+						logService.log(`Tried to register user with {login: ${login}}`.bgRed.black, 'registerUser', req);
 						subscriber.next({
 							error: true,
 							message: 'User with that login already exists'
@@ -48,7 +48,7 @@ module.exports = class UsersService {
 					}
 				});
 			} else {
-				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.black, 'registerUser', request);
+				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.black, 'registerUser', req);
 				subscriber.next({
 					error: true,
 					message: 'All required fields are not provided (login, email, password)'
@@ -58,22 +58,22 @@ module.exports = class UsersService {
 		});
 	}
 
-	createUserToken(request) {
+	createUserToken(req) {
 		return new Observable(subscriber => {
 
-			const { login, email, password } = request.body;
+			const { login, email, password } = req.body;
 			if (login && password) {
 				User.findOne({ login, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							logService.log(`User {login: ${user.login}} just generated a new token (login & password)`.bgCyan.black, 'createUserToken', request);
+							logService.log(`User {login: ${user.login}} just generated a new token (login & password)`.bgCyan.black, 'createUserToken', req);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
 							});
 						});
 					} else {
-						logService.log(`Bad credentials for user {login: ${login}}`.bgRed.white, 'createUserToken', request);
+						logService.log(`Bad credentials for user {login: ${login}}`.bgRed.white, 'createUserToken', req);
 						subscriber.next({
 							error: true,
 							message: 'Invalid login or password'
@@ -84,14 +84,14 @@ module.exports = class UsersService {
 				User.findOne({ email, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							logService.log(`User {login: ${user.login}} just generated a new token (email & password)`.bgCyan.black, 'createUserToken'.request);
+							logService.log(`User {login: ${user.login}} just generated a new token (email & password)`.bgCyan.black, 'createUserToken'.req);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
 							});
 						});
 					} else {
-						logService.log(`Bad credentials for user {email: ${email}}`.bgRed.white, 'createUserToken', request);
+						logService.log(`Bad credentials for user {email: ${email}}`.bgRed.white, 'createUserToken', req);
 						subscriber.next({
 							error: true,
 							message: 'Invalid email or password'
@@ -99,7 +99,7 @@ module.exports = class UsersService {
 					}
 				});
 			} else {
-				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.black, 'registerUser', request);
+				logService.log(`Not all fields provided {login: ${login}, email: ${email}}`.bgRed.black, 'registerUser', req);
 				subscriber.next({
 					error: true,
 					message: 'All required fields are not provided (login / email, password)'
@@ -109,21 +109,21 @@ module.exports = class UsersService {
 		});
 	}
 
-	checkToken(request) {
-		const { token } = request.body;
+	checkToken(req) {
+		const { token } = req.body;
 		return new Observable(subscriber => {
 
 			authService.checkUserToken(token).subscribe(response => {
 				if (response === false) {
 					// Token is invalid
-					logService.log(`Token validation failed`.bgRed.white, 'checkToken', request);
+					logService.log(`Token validation failed`.bgRed.white, 'checkToken', req);
 					subscriber.next({
 						valid: false
 					});
 				} else {
 					// Token is valid
 					User.findById(response._id).then(user => {
-						logService.log(`Token validation passed for user {login: ${user.login}, email: ${user.email}}`.bgGreen.black, 'checkToken', request);
+						logService.log(`Token validation passed for user {login: ${user.login}, email: ${user.email}}`.bgGreen.black, 'checkToken', req);
 						subscriber.next({
 							valid: true
 						});
@@ -134,7 +134,19 @@ module.exports = class UsersService {
 		});
 	}
 
+	deleteUser(req) {
+		return new Observable(subscriber => {
 
+			User.findById(req.user._id).then(user => {
+				user.remove().then(() => {
+					subscriber.next({
+						message: 'User was successfully deleted'
+					});
+				});
+			});
+
+		});
+	}
 
 };
 
