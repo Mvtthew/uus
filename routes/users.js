@@ -11,4 +11,8 @@ router.post('/token', (req, res) => {
 	userService.createUserToken(req.body).subscribe(data => res.json(data));
 });
 
+router.post('/checktoken', (req, res) => {
+	userService.checkToken(req.body).subscribe(data => res.json(data));
+});
+
 module.exports = router;

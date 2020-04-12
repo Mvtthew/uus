@@ -16,8 +16,18 @@ module.exports = class AuthService {
 		});
 	}
 
-	authorizeUser() {
+	checkUserToken(token) {
+		return new Observable(subscriber => {
 
+			jwt.verify(token, jwtSecret, (err, decoded) => {
+				if (err) {
+					subscriber.next(false);
+				} else {
+					subscriber.next(decoded);
+				}
+			});
+
+		});
 	}
 
 };

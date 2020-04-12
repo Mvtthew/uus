@@ -25,7 +25,7 @@ module.exports = class UsersService {
 									email,
 									password: md5(password)
 								}).then(user => {
-									console.log(`User {login: ${login}, email: ${email}} just registered`.bgWhite.black);
+									console.log(`${new Date().getTime()} | User {login: ${login}, email: ${email}} just registered`.bgWhite.black);
 									subscriber.next({ login: user.login, email: user.email });
 								});
 							} else {
@@ -50,7 +50,7 @@ module.exports = class UsersService {
 			}
 
 		});
-	};
+	}
 
 	createUserToken(user) {
 		return new Observable(subscriber => {
@@ -60,13 +60,14 @@ module.exports = class UsersService {
 				User.findOne({ login, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							console.log(`User {login: ${user.login}} just generated a new token (login & password)`.bgCyan.black);
+							console.log(`${new Date().getTime()} | User {login: ${user.login}} just generated a new token (login & password)`.bgCyan.black);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
 							});
 						});
 					} else {
+						console.log(`${new Date().getTime()} | Bad credentials for user {login: ${login}}`.bgRed.white);
 						subscriber.next({
 							error: true,
 							message: 'Invalid login or password'
@@ -77,13 +78,14 @@ module.exports = class UsersService {
 				User.findOne({ email, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							console.log(`User {login: ${user.login}} just generated a new token (email & password)`.bgCyan.black);
+							console.log(`${new Date().getTime()} | User {login: ${user.login}} just generated a new token (email & password)`.bgCyan.black);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
 							});
 						});
 					} else {
+						console.log(`${new Date().getTime()} | Bad credentials for user {email: ${email}}`.bgRed.white);
 						subscriber.next({
 							error: true,
 							message: 'Invalid email or password'
@@ -96,6 +98,31 @@ module.exports = class UsersService {
 					message: 'All required fields are not provided (login / email, password)'
 				});
 			}
+
+		});
+	}
+
+	checkToken(request) {
+		const { token } = request;
+		return new Observable(subscriber => {
+
+			authService.checkUserToken(token).subscribe(response => {
+				if (response === false) {
+					// Token is invalid
+					console.log(`Token validation failed`.bgRed.white);
+					subscriber.next({
+						valid: false
+					});
+				} else {
+					// Token is valid
+					User.findById(response._id).then(user => {
+						console.log(`${new Date().getTime()} | Token validation passed for user {login: ${user.login}, email: ${user.email}}`.bgGreen.black);
+						subscriber.next({
+							valid: true
+						});
+					});
+				}
+			});
 
 		});
 	}
