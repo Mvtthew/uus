@@ -24,6 +24,7 @@
 	},
 	"homepage": "https://github.com/Mvtthew/uus#readme",
 	"dependencies": {
+		"colors": "^1.4.0",
 		"express": "^4.17.1",
 		"jasmine-node": "^3.0.0",
 		"jsonwebtoken": "^8.5.1",
