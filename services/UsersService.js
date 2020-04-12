@@ -13,10 +13,9 @@ const User = require('../models/User');
 module.exports = class UsersService {
 
 	registerUser(request) {
-		const user = require.body;
 		return new Observable(subscriber => {
 
-			const { login, email, password } = user;
+			const { login, email, password } = request.body;
 			if (login && email && password) {
 				// Login verification
 				User.findOne({ login }).then(user => {
@@ -57,10 +56,9 @@ module.exports = class UsersService {
 	}
 
 	createUserToken(request) {
-		const { user } = request.body;
 		return new Observable(subscriber => {
 
-			const { login, email, password } = user;
+			const { login, email, password } = request.body;
 			if (login && password) {
 				User.findOne({ login, password: md5(password) }).then(user => {
 					if (user) {
