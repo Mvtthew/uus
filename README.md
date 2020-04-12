@@ -13,7 +13,7 @@ It's a **free** and **open source** microservice alternative to all authorizatio
 ✔️ User profile images support  
 ✔️ JWT based
 
-## 💻  Instalation
+## 💻 Instalation
 
 ### 📦 Requirements
 - Node.js [>12]

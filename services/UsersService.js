@@ -142,6 +142,7 @@ module.exports = class UsersService {
 		return new Observable(subscriber => {
 
 			User.findByIdAndRemove(req.user._id).then(user => {
+				logService.log(`Removed user for user {login: ${user.login}, email: ${user.email}}`.bgYellow.black, 'deleteUser', req);
 				subscriber.next({
 					message: 'User was successfully deleted'
 				});
@@ -181,6 +182,7 @@ module.exports = class UsersService {
 							image.mv(path.resolve(`./store/profile-images/${fileName}`), (err) => {
 								if (err) throw err;
 								user.image = fileName;
+								logService.log(`Uploaded profile image for user {login: ${user.login}} (image size: ${image.size}, image name: ${fileName})`.bgMagenta, 'addUserImage', req);
 								user.save().then(() => {
 									subscriber.next({
 										message: 'Profile image successfully uploaded'
@@ -189,12 +191,14 @@ module.exports = class UsersService {
 							});
 						});
 					} else {
+						logService.log(`Tried to upload not allowed file for user {login: ${user.login}} (type: ${image.mimetype})`.bgYellow.black, 'addUserImage', req);
 						subscriber.next({
 							error: true,
 							message: `File needs to be image (allowed types ${allowedMimetypes})`
 						});
 					}
 				} else {
+					logService.log(`Tried to upload to big file for user {login: ${user.login}} (size: ${image.size})`.bgYellow.black, 'addUserImage', req);
 					subscriber.next({
 						error: true,
 						message: `File is to large (max ${alowedMaxSize / 1024 / 1024}MB)`
@@ -219,12 +223,14 @@ module.exports = class UsersService {
 						if (err) throw err;
 						user.image = '';
 						user.save().then(() => {
+							logService.log(`Removed profile image for user {login: ${user.login}}`.bgYellow.black, 'removeUserImage', req);
 							subscriber.next({
 								message: 'User profile image was deleted'
 							});
 						});
 					});
 				} else {
+					logService.log(`Tried to remove not existing profile image for user {login: ${user.login}}`.bgYellow.black, 'removeUserImage', req);
 					subscriber.next({
 						message: 'User does not have profile image'
 					});
