@@ -168,13 +168,17 @@ module.exports = class UsersService {
 						'image/gif'
 					];
 					if (allowedMimetypes.includes(image.mimetype)) {
+						// Creating unique filename for all of users and all of images
 						const fileName = md5(`${req.user._id}-profile_image-${image.name}`) + image.name.substr(image.name.length - 5);
 						User.findOne(req.user._id).then(user => {
+							// Unlink previous user image if he had so
+							// TODO do not delete user image and reupload again if it is same image
 							if (user.image) {
 								fs.unlink(path.resolve(`./store/profile-images/${user.image}`), (err) => {
 									if (err) throw err;
 								});
 							}
+							// Upload new user image
 							image.mv(path.resolve(`./store/profile-images/${fileName}`), (err) => {
 								if (err) throw err;
 								user.image = fileName;
