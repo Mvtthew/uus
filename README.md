@@ -1,24 +1,25 @@
-# Universal Users System (UUS)
+# 🙆🙋Universal Users System (UUS)
+>By Mateusz Ożóg
 
 It's a **free** and **open source** microservice alternative to all authorization, autentification and indentification solitions.
 
-[API Docs (Work in Progress)](https://share.clickup.com/p/2cn1v-203/uus-api-docs)
+[📄 API Docs (Work in Progress)](https://share.clickup.com/p/2cn1v-203/uus-api-docs)
 
-## Advantages
-- Free and open source
-- Light and secure
-- MongoDB storage system
-- Easy to install and use in Docker container
-- User profile images support
-- JWT based
+## ➕ Advantages
+✔️ Free and open source  
+✔️ Light and secure  
+✔️ MongoDB storage system  
+✔️ Easy to install and use in Docker container  
+✔️ User profile images support  
+✔️ JWT based
 
-## Instalation
+## 💻  Instalation
 
-### Requirements
+### 📦 Requirements
 - Node.js [>12]
 - MongoDB [>3]
 
-### Instalation on your own
+### 📄 Instalation on your own
 1. Download repo 
 ```
 $ git clone https://github.com/Mvtthew/uus
@@ -37,7 +38,7 @@ $ npm run start
 ```
 
 
-### Running in docker container
+### 🐳 Running in docker container
 > Docker [>19] * Docker-compose required 
 1. Download repo 
 ```
@@ -52,7 +53,7 @@ $ docker-compose build
 $ docker-compose up
 ```
 
-## Todo's and future features of UUS
+## ✏️ Todo's and future features of UUS
 [ ] User roles  
 [ ] Permissions  
 [ ] Permissions linked to roles  
