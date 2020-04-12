@@ -18,7 +18,11 @@ router.post('/checktoken', (req, res) => {
 });
 
 router.delete('/me', auth, (req, res) => {
-	userService.deleteUser(req).subscribe(data => res.json(data));
+	// First remove user image if he have so
+	userService.removeUserImage(req).subscribe(() => {
+		// Then remove user entity
+		userService.deleteUser(req).subscribe(data => res.json(data));
+	});
 });
 
 
