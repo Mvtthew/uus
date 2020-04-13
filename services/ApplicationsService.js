@@ -41,7 +41,7 @@ module.exports = class ApplicationService {
 						if (valid) {
 							Application.findOne({ name }).then(application => {
 								if (!application) {
-									Application.create({ name }).then(application => {
+									Application.create({ name, admins }).then(application => {
 										subscriber.next(application);
 									});
 								} else {
