@@ -21,10 +21,6 @@ const applicationSchema = new mongoose.Schema({
 					type: String,
 					required: true
 				},
-				code: {
-					type: Number,
-					default: 0
-				},
 
 				// Perrmissions
 				permissions: {
@@ -33,10 +29,6 @@ const applicationSchema = new mongoose.Schema({
 							name: {
 								type: String,
 								required: true
-							},
-							code: {
-								type: Number,
-								default: 0
 							}
 						}
 					],
