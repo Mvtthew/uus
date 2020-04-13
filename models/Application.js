@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const Role = require('./Role');
-
 const applicationSchema = new mongoose.Schema({
 
 	name: {
@@ -10,8 +8,42 @@ const applicationSchema = new mongoose.Schema({
 		unique: true
 	},
 
+	admins: {
+		type: [String],
+		default: []
+	},
+
+	// Roles
 	roles: {
-		type: [Role],
+		type: [
+			{
+				name: {
+					type: String,
+					required: true
+				},
+				code: {
+					type: Number,
+					default: 0
+				},
+
+				// Perrmissions
+				permissions: {
+					type: [
+						{
+							name: {
+								type: String,
+								required: true
+							},
+							code: {
+								type: Number,
+								default: 0
+							}
+						}
+					],
+					default: []
+				}
+			}
+		],
 		default: []
 	}
 
