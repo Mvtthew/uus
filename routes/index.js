@@ -12,6 +12,9 @@ router.get('/', (req, res) => {
 });
 
 // Users routes
-router.use('/', require('./users'));
+router.use('/users', require('./users'));
+
+// Application routes
+router.use('/applications', require('./applications'));
 
 module.exports = router;
