@@ -62,6 +62,14 @@ module.exports = class UsersService {
 		});
 	}
 
+	getUserInformation(req) {
+		return new Observable(subscriber => {
+			User.findById(req.user._id).select({ password: 0 }).then(user => {
+				subscriber.next(user);
+			});
+		});
+	}
+
 	createUserToken(req) {
 		return new Observable(subscriber => {
 
@@ -70,7 +78,7 @@ module.exports = class UsersService {
 				User.findOne({ login, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							logService.log(`User {login: ${req.user.login}} just generated a new token (login & password)`.bgCyan.black, 'createUserToken', req);
+							logService.log(`User {login: ${login}} just generated a new token (login & password)`.bgCyan.black, 'createUserToken', req);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
@@ -88,7 +96,7 @@ module.exports = class UsersService {
 				User.findOne({ email, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							logService.log(`User {login: ${req.user.login}} just generated a new token (email & password)`.bgCyan.black, 'createUserToken'.req);
+							logService.log(`User {login: ${login}} just generated a new token (email & password)`.bgCyan.black, 'createUserToken'.req);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token

@@ -11,6 +11,10 @@ router.post('/', (req, res) => {
 	userService.registerUser(req).subscribe(data => res.json(data));
 });
 
+router.get('/', auth, (req, res) => {
+	userService.getUserInformation(req).subscribe(data => res.json(data));
+});
+
 router.post('/token', (req, res) => {
 	userService.createUserToken(req).subscribe(data => res.json(data));
 });
