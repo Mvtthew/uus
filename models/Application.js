@@ -36,7 +36,15 @@ const applicationSchema = new mongoose.Schema({
 				}
 			}
 		],
-		default: []
+		default: [
+			{
+				name: 'ExampleRole',
+				permissions: [
+					{ name: 'ExamplePermission' },
+					{ name: 'ExamplePermission - feel free to update / delete it' }
+				]
+			}
+		]
 	}
 
 });
