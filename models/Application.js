@@ -24,14 +24,7 @@ const applicationSchema = new mongoose.Schema({
 
 				// Perrmissions
 				permissions: {
-					type: [
-						{
-							name: {
-								type: String,
-								required: true
-							}
-						}
-					],
+					type: [String],
 					default: []
 				}
 			}
