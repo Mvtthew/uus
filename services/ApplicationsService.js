@@ -6,20 +6,20 @@ const User = require('../models/User');
 
 module.exports = class ApplicationService {
 
-	checkValidOperators(operators) {
+	checkValidUsers(users) {
 		return new Observable(subscriber => {
 
 			let valid = true;
 			let counter = 0;
-			for (let i = 0; i < operators.length; i++) {
+			for (let i = 0; i < users.length; i++) {
 				counter++;
-				const adminId = operators[i];
-				User.findById(adminId).then(user => {
+				const userId = users[i];
+				User.findById(userId).then(user => {
 					if (!user) {
 						subscriber.next(false);
 						valid = false;
 					} else {
-						if (counter === operators.length) {
+						if (counter === users.length) {
 							if (valid) {
 								subscriber.next(true);
 							}
@@ -30,7 +30,6 @@ module.exports = class ApplicationService {
 					valid = false;
 				});
 			}
-
 		});
 	}
 
@@ -40,7 +39,7 @@ module.exports = class ApplicationService {
 			const { name, operators, permissions } = req.body;
 			if (name, operators) {
 				if (operators.length > 0) {
-					this.checkValidOperators(operators).pipe(first()).subscribe(valid => {
+					this.checkValidUsers(operators).pipe(first()).subscribe(valid => {
 						if (valid) {
 							Application.findOne({ name }).then(application => {
 								if (!application) {
@@ -78,7 +77,7 @@ module.exports = class ApplicationService {
 	}
 
 	editApplication(req) {
-		const applicationId = req.params.id;
+		const { applicationId } = req.params;
 		return new Observable(subscriber => {
 
 			if (applicationId) {
@@ -87,16 +86,40 @@ module.exports = class ApplicationService {
 					Application.findById(applicationId).then(application => {
 						if (application) {
 							if (application.operators.includes(req.user._id)) {
-								application.updateOne(editedApplication).then(() => {
-									Application.findById(applicationId).then(application => {
-										subscriber.next(application);
+								if (editedApplication.users) {
+									this.checkValidUsers(operators).pipe(first()).subscribe(valid => {
+										if (valid) {
+											application.updateOne(editedApplication).then(() => {
+												Application.findById(applicationId).then(application => {
+													subscriber.next(application);
+												});
+											}).catch(err => {
+												subscriber.next({
+													error: true,
+													message: 'Validation error',
+													errorDetails: err
+												});
+											});
+										} else {
+											subscriber.next({
+												error: true,
+												message: 'One or more of provided operators ID\'s is/are invalid (user does not exists)'
+											});
+										}
 									});
-								}).catch(() => {
-									subscriber.next({
-										error: true,
-										message: 'This application name is already taken'
+								} else {
+									application.updateOne(editedApplication).then(() => {
+										Application.findById(applicationId).then(application => {
+											subscriber.next(application);
+										});
+									}).catch(err => {
+										subscriber.next({
+											error: true,
+											message: 'Validation error',
+											errorDetails: err
+										});
 									});
-								});
+								}
 							} else {
 								subscriber.next({
 									error: true,
@@ -128,6 +151,48 @@ module.exports = class ApplicationService {
 				});
 			}
 
+		});
+	}
+
+	registerUserToApplication(req) {
+		return new Observable(subscriber => {
+			const { applicationId } = req.params;
+			if (applicationId) {
+				Application.findById(applicationId).then(application => {
+					if (application) {
+						// Check if user is already registered
+						if (application.users.filter(applicationUser => applicationUser._uid == req.user._id).length === 0) {
+							// Add user to application users array
+							application.users.push({ '_uid': req.user._id });
+							application.save().then(() => {
+								subscriber.next({
+									message: 'Successfylly registered'
+								});
+							});
+						} else {
+							subscriber.next({
+								error: true,
+								message: 'User is already registered in this application'
+							});
+						}
+					} else {
+						subscriber.next({
+							error: true,
+							message: 'Invalid application ID'
+						});
+					}
+				}).catch(() => {
+					subscriber.next({
+						error: true,
+						message: 'Invalid application ID'
+					});
+				});
+			} else {
+				subscriber.next({
+					error: true,
+					message: 'You need to specify application by Id'
+				});
+			}
 		});
 	}
 

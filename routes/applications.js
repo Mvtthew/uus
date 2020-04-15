@@ -9,8 +9,13 @@ router.post('/', (req, res) => {
 	applicationsService.createNewApplication(req).subscribe(data => res.json(data));
 });
 
-router.put('/:id', auth, (req, res) => {
+router.put('/:applicationId', auth, (req, res) => {
 	applicationsService.editApplication(req).subscribe(data => res.json(data));
+});
+
+// Register user to application
+router.post('/:applicationId/register', auth, (req, res) => {
+	applicationsService.registerUserToApplication(req).subscribe(data => res.json(data));
 });
 
 module.exports = router;
