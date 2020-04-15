@@ -36,14 +36,14 @@ module.exports = class ApplicationService {
 	createNewApplication(req) {
 		return new Observable(subscriber => {
 
-			const { name, operators, permissions } = req.body;
+			const { name, operators, roles, defaultRoles } = req.body;
 			if (name, operators) {
 				if (operators.length > 0) {
 					this.checkValidUsers(operators).pipe(first()).subscribe(valid => {
 						if (valid) {
 							Application.findOne({ name }).then(application => {
 								if (!application) {
-									Application.create({ name, operators, permissions }).then(application => {
+									Application.create({ name, operators, roles, defaultRoles }).then(application => {
 										subscriber.next(application);
 									});
 								} else {
@@ -86,27 +86,34 @@ module.exports = class ApplicationService {
 					Application.findById(applicationId).then(application => {
 						if (application) {
 							if (application.operators.includes(req.user._id)) {
-								if (editedApplication.users) {
-									this.checkValidUsers(operators).pipe(first()).subscribe(valid => {
-										if (valid) {
-											application.updateOne(editedApplication).then(() => {
-												Application.findById(applicationId).then(application => {
-													subscriber.next(application);
+								if (editedApplication.operators) {
+									if (editedApplication.operators.length > 0) {
+										this.checkValidUsers(editedApplication.operators).pipe(first()).subscribe(valid => {
+											if (valid) {
+												application.updateOne(editedApplication).then(() => {
+													Application.findById(applicationId).then(application => {
+														subscriber.next(application);
+													});
+												}).catch(err => {
+													subscriber.next({
+														error: true,
+														message: 'Validation error',
+														errorDetails: err
+													});
 												});
-											}).catch(err => {
+											} else {
 												subscriber.next({
 													error: true,
-													message: 'Validation error',
-													errorDetails: err
+													message: 'One or more of provided operators ID\'s is/are invalid (user does not exists)'
 												});
-											});
-										} else {
-											subscriber.next({
-												error: true,
-												message: 'One or more of provided operators ID\'s is/are invalid (user does not exists)'
-											});
-										}
-									});
+											}
+										});
+									} else {
+										subscriber.next({
+											error: true,
+											message: 'You need to provde at least one application operator'
+										}); q;
+									}
 								} else {
 									application.updateOne(editedApplication).then(() => {
 										Application.findById(applicationId).then(application => {
@@ -163,7 +170,7 @@ module.exports = class ApplicationService {
 						// Check if user is already registered
 						if (application.users.filter(applicationUser => applicationUser._uid == req.user._id).length === 0) {
 							// Add user to application users array
-							application.users.push({ '_uid': req.user._id });
+							application.users.push({ '_uid': req.user._id, roles: application.defaultRoles });
 							application.save().then(() => {
 								subscriber.next({
 									message: 'Successfylly registered'
