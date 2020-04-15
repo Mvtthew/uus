@@ -165,8 +165,8 @@ module.exports = class UsersService {
 	addUserImage(req) {
 		return new Observable(subscriber => {
 
-			const { image } = req.files;
-			if (image) {
+			if (req.files) {
+				const { image } = req.files;
 				const alowedMaxSize = 1024 * 1024 * 5;
 				if (image.size < alowedMaxSize) {
 					const allowedMimetypes = [
