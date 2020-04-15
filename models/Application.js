@@ -8,7 +8,7 @@ const applicationSchema = new mongoose.Schema({
 		unique: true
 	},
 
-	admins: {
+	operators: {
 		type: [String],
 		default: []
 	},
@@ -45,7 +45,21 @@ const applicationSchema = new mongoose.Schema({
 				]
 			}
 		]
-	}
+	},
+
+	// Users
+	users: [
+		{
+			_uid: {
+				type: String,
+				required: true
+			},
+			roles: {
+				type: [String],
+				default: []
+			}
+		}
+	]
 
 });
 

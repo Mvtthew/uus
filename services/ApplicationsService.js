@@ -6,20 +6,20 @@ const User = require('../models/User');
 
 module.exports = class ApplicationService {
 
-	checkValidAdmins(admins) {
+	checkValidOperators(operators) {
 		return new Observable(subscriber => {
 
 			let valid = true;
 			let counter = 0;
-			for (let i = 0; i < admins.length; i++) {
+			for (let i = 0; i < operators.length; i++) {
 				counter++;
-				const adminId = admins[i];
+				const adminId = operators[i];
 				User.findById(adminId).then(user => {
 					if (!user) {
 						subscriber.next(false);
 						valid = false;
 					} else {
-						if (counter === admins.length) {
+						if (counter === operators.length) {
 							if (valid) {
 								subscriber.next(true);
 							}
@@ -37,14 +37,14 @@ module.exports = class ApplicationService {
 	createNewApplication(req) {
 		return new Observable(subscriber => {
 
-			const { name, admins, permissions } = req.body;
-			if (name, admins) {
-				if (admins.length > 0) {
-					this.checkValidAdmins(admins).pipe(first()).subscribe(valid => {
+			const { name, operators, permissions } = req.body;
+			if (name, operators) {
+				if (operators.length > 0) {
+					this.checkValidOperators(operators).pipe(first()).subscribe(valid => {
 						if (valid) {
 							Application.findOne({ name }).then(application => {
 								if (!application) {
-									Application.create({ name, admins, permissions }).then(application => {
+									Application.create({ name, operators, permissions }).then(application => {
 										subscriber.next(application);
 									});
 								} else {
@@ -57,20 +57,20 @@ module.exports = class ApplicationService {
 						} else {
 							subscriber.next({
 								error: true,
-								message: 'One or more of provided admins ID\'s is/are invalid (user does not exists)'
+								message: 'One or more of provided operators ID\'s is/are invalid (user does not exists)'
 							});
 						}
 					});
 				} else {
 					subscriber.next({
 						error: true,
-						message: 'You need to provde at least one application admin'
+						message: 'You need to provde at least one application operator'
 					});
 				}
 			} else {
 				subscriber.next({
 					error: true,
-					message: 'You need to provide all required fields (name, admins)'
+					message: 'You need to provide all required fields (name, operators)'
 				});
 			}
 
@@ -86,7 +86,7 @@ module.exports = class ApplicationService {
 				if (editedApplication) {
 					Application.findById(applicationId).then(application => {
 						if (application) {
-							if (application.admins.includes(req.user._id)) {
+							if (application.operators.includes(req.user._id)) {
 								application.updateOne(editedApplication).then(() => {
 									Application.findById(applicationId).then(application => {
 										subscriber.next(application);
