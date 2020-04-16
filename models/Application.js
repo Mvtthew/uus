@@ -13,25 +13,13 @@ const applicationSchema = new mongoose.Schema({
 		default: []
 	},
 
-	// Roles
-	roles: {
-		type: [
-			{
-				name: {
-					type: String,
-					required: true
-				},
-
-				// Perrmissions
-				permissions: {
-					type: [String],
-					default: []
-				}
-			}
-		]
+	// Permissions
+	permissions: {
+		type: [String],
+		default: []
 	},
 
-	defaultRoles: {
+	defaultPermissions: {
 		type: [String],
 		default: []
 	},
@@ -43,7 +31,7 @@ const applicationSchema = new mongoose.Schema({
 				type: String,
 				required: true
 			},
-			roles: {
+			permissions: {
 				type: [String],
 				default: []
 			}
