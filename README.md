@@ -39,7 +39,7 @@ $ npm run start
 
 
 ### 🐳 Running in docker container
-> Docker [>19] * Docker-compose required 
+> Docker [>19] and compose required 
 1. Download repo 
 ```
 $ git clone https://github.com/Mvtthew/uus
