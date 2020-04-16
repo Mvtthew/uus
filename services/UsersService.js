@@ -17,7 +17,7 @@ module.exports = class UsersService {
 	registerUser(req) {
 		return new Observable(subscriber => {
 
-			const { login, email, password } = req.body;
+			const { login, name, email, password } = req.body;
 			if (login && email && password) {
 				// Login verification
 				User.findOne({ login }).then(user => {
@@ -27,6 +27,7 @@ module.exports = class UsersService {
 							if (!user) {
 								User.create({
 									login,
+									name,
 									email,
 									password: md5(password)
 								}).then(() => {
