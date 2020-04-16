@@ -1,6 +1,9 @@
 const { Observable } = require('rxjs');
 const { first } = require('rxjs/operators');
 
+const LogService = require('./LogService');
+const logService = new LogService();
+
 const Application = require('../models/Application');
 const User = require('../models/User');
 
@@ -44,9 +47,11 @@ module.exports = class ApplicationService {
 							Application.findOne({ name }).then(application => {
 								if (!application) {
 									Application.create({ name, operators, permissions, defaultPermissions }).then(application => {
+										logService.log(`Created new application ${application}`.bgGreen.white, 'createNewApplication', req);
 										subscriber.next(application);
 									});
 								} else {
+									logService.log(`Tried to create dupplicate application with name '${name}'`.bgYellow.white, 'createNewApplication', req);
 									subscriber.next({
 										error: true,
 										message: 'Application with that name already exists'
@@ -54,6 +59,7 @@ module.exports = class ApplicationService {
 								}
 							});
 						} else {
+							logService.log(`Tried to create application with invalid operators {name:'${name}'}`.bgYellow.white, 'createNewApplication', req);
 							subscriber.next({
 								error: true,
 								message: 'One or more of provided operators ID\'s is/are invalid (user does not exists)'
@@ -61,6 +67,7 @@ module.exports = class ApplicationService {
 						}
 					});
 				} else {
+					logService.log(`Tried to create application without operators {name:'${name}'}`.bgYellow.white, 'createNewApplication', req);
 					subscriber.next({
 						error: true,
 						message: 'You need to provde at least one application operator'
@@ -92,9 +99,11 @@ module.exports = class ApplicationService {
 											if (valid) {
 												application.updateOne(editedApplication).then(() => {
 													Application.findById(applicationId).then(application => {
+														logService.log(`User {login: '${req.user.login}'} edited application ${application}`.bgGreen.white, 'editApplication', req);
 														subscriber.next(application);
 													});
 												}).catch(err => {
+													logService.log(`User {login: '${req.user.login}'} tried to edit application ID: ${applicationId} and got error ${err}`.bgYellow.white, 'editApplication', req);
 													subscriber.next({
 														error: true,
 														message: 'Validation error',
@@ -102,6 +111,7 @@ module.exports = class ApplicationService {
 													});
 												});
 											} else {
+												logService.log(`User {login: '${req.user.login}'} tried to edit application ID: ${applicationId} and provided invalid operators`.bgYellow.white, 'editApplication', req);
 												subscriber.next({
 													error: true,
 													message: 'One or more of provided operators ID\'s is/are invalid (user does not exists)'
@@ -109,6 +119,7 @@ module.exports = class ApplicationService {
 											}
 										});
 									} else {
+										logService.log(`User {login: '${req.user.login}'} tried to edit application ID: ${applicationId} and not provided operators`.bgYellow.white, 'editApplication', req);
 										subscriber.next({
 											error: true,
 											message: 'You need to provde at least one application operator'
@@ -117,9 +128,11 @@ module.exports = class ApplicationService {
 								} else {
 									application.updateOne(editedApplication).then(() => {
 										Application.findById(applicationId).then(application => {
+											logService.log(`User {login: '${req.user.login}'} edited application ${application}`.bgGreen.white, 'editApplication', req);
 											subscriber.next(application);
 										});
 									}).catch(err => {
+										logService.log(`User {login: '${req.user.login}'} tried to edit application ID: ${applicationId} and got error ${err}`.bgYellow.white, 'editApplication', req);
 										subscriber.next({
 											error: true,
 											message: 'Validation error',
@@ -128,6 +141,7 @@ module.exports = class ApplicationService {
 									});
 								}
 							} else {
+								logService.log(`User {login: '${req.user.login}'} tried edit application '${application}' but is not this apllication operator`.bgYellow.white, 'editApplication', req);
 								subscriber.next({
 									error: true,
 									message: 'You are not allowed to edit this application'
@@ -172,11 +186,13 @@ module.exports = class ApplicationService {
 							// Add user to application users array
 							application.users.push({ '_uid': req.user._id, permissions: application.defaultPermissions });
 							application.save().then(() => {
+								logService.log(`User {login: '${req.user.login}'} registered to application {name: '${application.name}'}`.bgGreen.white, 'registerUserToApplication', req);
 								subscriber.next({
 									message: 'Successfylly registered'
 								});
 							});
 						} else {
+							logService.log(`User {login: '${req.user.login}'} tried to register to application {name: '${application.name}'} but is already registered in this application`.bgYellow.white, 'registerUserToApplication', req);
 							subscriber.next({
 								error: true,
 								message: 'User is already registered in this application'
