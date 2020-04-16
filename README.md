@@ -14,13 +14,13 @@ It's a **free** and **open source** micro service alternative to all authorizati
 ✔️ JWT based   
 ✔️ Logs + actions logging
 
-## 💻 Instalation
+## 💻 Installation
 
 ### 📦 Requirements
 - Node.js [>12]
 - MongoDB [>3]
 
-### 📄 Instalation on your own
+### 📄 Installation on your own
 1. Download repo 
 ```
 $ git clone https://github.com/Mvtthew/uus
@@ -53,9 +53,3 @@ $ docker-compose build
 ```
 $ docker-compose up
 ```
-
-## ✏️ Todo's and future features of UUS
-[ ] User roles  
-[ ] Permissions  
-[ ] Permissions linked to roles  
-[ ] Editable and scalable users/roles system
