@@ -12,6 +12,7 @@ It's a **free** and **open source** micro service alternative to all authorizati
 ✔️ Easy to install and use in Docker container  
 ✔️ User profile images support  
 ✔️ JWT based
+✔️ Logs + actions logging
 
 ## 💻 Instalation
 
