@@ -1,7 +1,7 @@
 # 🙆🙋Universal Users System (UUS)
 >By Mateusz Ożóg
 
-It's a **free** and **open source** microservice alternative to all authorization, autentification and indentification solitions.
+It's a **free** and **open source** micro service alternative to all authorization, authentication and identification solutions.
 
 [📄 API Docs (Work in Progress)](https://share.clickup.com/p/2cn1v-203/uus-api-docs)
 
