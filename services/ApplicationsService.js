@@ -231,11 +231,12 @@ module.exports = class ApplicationService {
 							let index = 0;
 							application.users.forEach(user => {
 								User.findById(user._uid).select({ password: 0, _id: 0 }).then(backUser => {
+									// Throw application values (not root values)
 									backUser.attributes = user.attributes;
 									backUser.permissions = user.permissions;
 									backUser._id = user._id;
 									applicationUsers.push(backUser);
-
+									// End ing 
 									if (index === application.users.length - 1) {
 										subscriber.next(applicationUsers);
 									}
@@ -252,6 +253,50 @@ module.exports = class ApplicationService {
 						subscriber.next({
 							error: true,
 							message: 'You need to specify application ID'
+						});
+					}
+				}).catch(() => {
+					subscriber.next({
+						error: true,
+						message: 'Application with this ID does not exist'
+					});
+				});
+			} else {
+				subscriber.next({
+					error: true,
+					message: 'You need to specify application ID'
+				});
+			}
+
+		});
+	}
+
+	getMeFromApplication(req) {
+		return new Observable(subscriber => {
+
+			const { applicationId } = req.params;
+			if (applicationId) {
+				Application.findById(applicationId).then(application => {
+					if (application) {
+						if (application.users.filter(appUser => appUser._uid == req.user._id).length > 0) {
+							User.findById(req.user._id).select({ password: 0 }).then(backUser => {
+								const user = application.users.filter(user => user._uid == req.user._id)[0];
+								// Throw application values (not root values)
+								backUser.permissions = user.permissions;
+								backUser.attributes = user.attributes;
+								backUser._id = user._id;
+								subscriber.next(backUser);
+							});
+						} else {
+							subscriber.next({
+								error: true,
+								message: 'You are not registered in this application'
+							});
+						}
+					} else {
+						subscriber.next({
+							error: true,
+							message: 'Application with this ID does not exist'
 						});
 					}
 				}).catch(() => {
