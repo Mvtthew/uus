@@ -39,14 +39,14 @@ module.exports = class ApplicationService {
 	createNewApplication(req) {
 		return new Observable(subscriber => {
 
-			const { name, operators, permissions, defaultPermissions } = req.body;
+			const { name, operators, permissions, defaultPermissions, defaultAttributes } = req.body;
 			if (name, operators) {
 				if (operators.length > 0) {
 					this.checkValidUsers(operators).pipe(first()).subscribe(valid => {
 						if (valid) {
 							Application.findOne({ name }).then(application => {
 								if (!application) {
-									Application.create({ name, operators, permissions, defaultPermissions }).then(application => {
+									Application.create({ name, operators, permissions, defaultPermissions, defaultAttributes }).then(application => {
 										logService.log(`Created new application ${application}`.bgGreen.white, 'createNewApplication', req);
 										subscriber.next(application);
 									});
@@ -184,7 +184,7 @@ module.exports = class ApplicationService {
 						// Check if user is already registered
 						if (application.users.filter(applicationUser => applicationUser._uid == req.user._id).length === 0) {
 							// Add user to application users array
-							application.users.push({ '_uid': req.user._id, permissions: application.defaultPermissions });
+							application.users.push({ '_uid': req.user._id, permissions: application.defaultPermissions, attributes: application.defaultAttributes });
 							application.save().then(() => {
 								logService.log(`User {login: '${req.user.login}'} registered to application {name: '${application.name}'}`.bgGreen.white, 'registerUserToApplication', req);
 								subscriber.next({

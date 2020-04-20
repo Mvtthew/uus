@@ -23,6 +23,10 @@ const applicationSchema = new mongoose.Schema({
 		type: [String],
 		default: []
 	},
+	defaultAttributes: {
+		type: Object,
+		default: {}
+	},
 
 	// Users
 	users: [
@@ -34,6 +38,10 @@ const applicationSchema = new mongoose.Schema({
 			permissions: {
 				type: [String],
 				default: []
+			},
+			attributes: {
+				type: Object,
+				default: {}
 			}
 		}
 	]
