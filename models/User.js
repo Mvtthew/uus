@@ -29,8 +29,10 @@ const userSchema = new mongoose.Schema({
 	image: {
 		type: String,
 		default: ''
-	}
+	},
 
+	permissions: [String],
+	attributes: Object
 
 });
 

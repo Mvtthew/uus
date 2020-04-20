@@ -13,6 +13,10 @@ router.put('/:applicationId', auth, (req, res) => {
 	applicationsService.editApplication(req).subscribe(data => res.json(data));
 });
 
+router.get('/:applicationId/users', auth, (req, res) => {
+	applicationsService.getAllApplicationUsers(req).subscribe(data => res.json(data));
+});
+
 // Register user to application
 router.post('/:applicationId/register', auth, (req, res) => {
 	applicationsService.registerUserToApplication(req).subscribe(data => res.json(data));
