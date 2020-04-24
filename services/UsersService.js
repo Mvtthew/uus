@@ -136,10 +136,17 @@ module.exports = class UsersService {
 				} else {
 					// Token is valid
 					User.findById(response._id).then(user => {
-						logService.log(`Token validation passed for user {login: ${user.login}, email: ${user.email}}`.bgGreen.black, 'checkToken', req);
-						subscriber.next({
-							valid: true
-						});
+						if (user) {
+							logService.log(`Token validation passed for user {login: ${user.login}, email: ${user.email}}`.bgGreen.black, 'checkToken', req);
+							subscriber.next({
+								valid: true
+							});
+						} else {
+							logService.log(`Token validation failed`.bgRed.white, 'checkToken', req);
+							subscriber.next({
+								valid: false
+							});
+						}
 					});
 				}
 			});

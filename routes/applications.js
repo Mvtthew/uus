@@ -26,4 +26,9 @@ router.post('/:applicationId/register', auth, (req, res) => {
 	applicationsService.registerUserToApplication(req).subscribe(data => res.json(data));
 });
 
+// Unregister user to application
+router.post('/:applicationId/unregister', auth, (req, res) => {
+	applicationsService.unregisterUserFromApplication(req).subscribe(data => res.json(data));
+});
+
 module.exports = router;

@@ -315,4 +315,46 @@ module.exports = class ApplicationService {
 		});
 	}
 
+	unregisterUserFromApplication(req) {
+		return new Observable(subscriber => {
+
+			const { applicationId } = req.params;
+			if (applicationId) {
+				Application.findById(applicationId).then(application => {
+					if (application) {
+						if (application.users.filter(appUser => appUser._uid == req.user._id).length > 0) {
+							application.users = application.users.filter(appUser => appUser._uid != req.user._id);
+							application.save().then(() => {
+								subscriber.next({
+									message: 'Successfully unregistered from application'
+								});
+							});
+						} else {
+							subscriber.next({
+								error: true,
+								message: 'You are not registered to this application'
+							});
+						}
+					} else {
+						subscriber.next({
+							error: true,
+							message: 'Application with this ID does not exist'
+						});
+					}
+				}).catch(() => {
+					subscriber.next({
+						error: true,
+						message: 'Application with this ID does not exist'
+					});
+				});
+			} else {
+				subscriber.next({
+					error: true,
+					message: 'You need to specify application ID'
+				});
+			}
+
+		});
+	}
+
 };
