@@ -1,7 +1,11 @@
 const express = require('express');
+const cors = require('cors');
 const expressFileupload = require('express-fileupload');
 const colors = require('colors');
 const app = express();
+
+// Cors (*)
+app.use(cors());
 
 // Body parsers
 app.use(express.json());
