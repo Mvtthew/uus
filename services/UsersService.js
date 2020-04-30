@@ -97,7 +97,7 @@ module.exports = class UsersService {
 				User.findOne({ email, password: md5(password) }).then(user => {
 					if (user) {
 						authService.generateUserToken(user._id).subscribe(token => {
-							logService.log(`User {login: ${login}} just generated a new token (email & password)`.bgCyan.black, 'createUserToken'.req);
+							logService.log(`User {login: ${login}} just generated a new token (email & password)`.bgCyan.black, 'createUserToken', req);
 							subscriber.next({
 								tokenType: 'Bearer',
 								token
